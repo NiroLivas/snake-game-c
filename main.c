@@ -2,38 +2,14 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <conio.h>
-#include <unistd.h>
 #include <time.h>
-
-/* September 4, 2026
-Hey there!
-
-I'm Niro, a first-year IT college student.
-
-I learned the basics of C in a day and decided to put what
-I learned into practice by making this Snake game. (The Tic Tac Toe one came prior)
-
-I also applied my previous programming experience with:
-- Luau (5 years)
-- Python (1 year)
-- JavaScript (1 year)
-
-This project was made primarily through my own learning,
-with some help from documentation and AI, particularly
-when working with the WINAPI part.
-
-There may be bugs or areas where the code could be improved,
-but that's part of the learning process!
-
-Have fun!
-*/
 
 int snake[100][2] = {{0,0}};
 int highscore = 0;
 int speed = 3;
 
 int appleSpawned = 0;
-int snakeLength = 15;
+int snakeLength = 1;
 
 int option;
 int appleX;
@@ -66,47 +42,17 @@ char keyToMove(int key) {
 	return '\0';
 }
 
-DWORD WINAPI inputThread(LPVOID arg) {
-    while (1) {
-        if (_kbhit()) {
-            int input = _getch();
-
-            if (input == 0 || input == 224) {
-                input = _getch();
-            }
-
-            char key = keyToMove(input);
-
-            if (key != '\0') {
-				if(snakeLength == 1) {
-					direction = key;
-					continue;
-				}
-            	
-                if(((direction == 'w' && key != 's') ||
-                    (direction == 's' && key != 'w') ||
-                    (direction == 'a' && key != 'd') ||
-                    (direction == 'd' && key != 'a'))) {
-                    
-                    direction = key;
-                }
-            }
-        }
-    }
-    return 0;
-}
-
 int initiateSpeed() {
 	if(speed == 1)
-		return 1000000;
+		return 1000;
 	else if (speed == 2)
-		return 800000;
+		return 800;
 	else if (speed == 3)
-		return 600000;
+		return 600;
 	else if (speed == 4)
-		return 400000;
+		return 400;
 	else if (speed == 5)
-		return 200000;
+		return 200;
 }
 
 void speedConfiguration() {
@@ -194,6 +140,32 @@ int startGame() {
 	while(1) {
 		system("cls");
 		
+		// Keyboard Input
+		if (_kbhit()) {
+            int input = _getch();
+
+            if (input == 0 || input == 224) {
+                input = _getch();
+            }
+
+            char key = keyToMove(input);
+
+            if (key != '\0') {
+				if(snakeLength == 1) {
+					direction = key;
+					continue;
+				}
+            	
+                if(((direction == 'w' && key != 's') ||
+                    (direction == 's' && key != 'w') ||
+                    (direction == 'a' && key != 'd') ||
+                    (direction == 'd' && key != 'a'))) {
+                    
+                    direction = key;
+                }
+            }
+        }
+		
 		// Move body
 		for (int i = snakeLength - 1; i > 0; i--) {
 			if(direction == '\0')
@@ -261,11 +233,6 @@ int startGame() {
 		puts("*--------------------*");
 		printf("Score: %d\n", applesEaten);
 		printf("Highscore: %d\n\n", highscore);
-//		puts("-----Debugging-----");
-//		printf("AppleX: %d\n", appleX);
-//		printf("AppleY: %d\n\n", appleY);
-//		printf("Snake X: %d\n", snake[0][0]);
-//		printf("Snake Y: %d", snake[0][1]);
 
 		// Death Logic
 		if((snake[0][0] == 20 || snake[0][0] == -1) || (snake[0][1] == 5 || snake[0][1] == -1)) {
@@ -276,7 +243,7 @@ int startGame() {
 			break;
 		}
 
-		usleep(sleepSpeed);
+		Sleep(sleepSpeed);
 	}
 	
 	if(applesEaten > highscore) {
@@ -311,16 +278,6 @@ int main() {
 	
 	fscanf(readData, "Highscore: %d\nSpeed: %d", &highscore, &speed);
 	fclose(readData);
-	
-	// For user input
-	CreateThread(
-        NULL,
-        0,
-        inputThread,
-        NULL,
-        0,
-        NULL
-    );
 
     // Menu
   	int result;
